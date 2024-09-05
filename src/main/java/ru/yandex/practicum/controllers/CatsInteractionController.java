@@ -26,20 +26,13 @@ public class CatsInteractionController {
         return Map.of("happiness", happiness);
     }
 
-    @ExceptionHandler
-    // отлавливаем исключение IllegalArgumentException
-    public Map<String, String> handleNegativeCount(final IllegalArgumentException e) {
-        // возвращаем сообщение об ошибке
-        return Map.of("error", "Передан отрицательный параметр count.",
-                "errorMessage", e.getMessage());
-    }
-
-    @ExceptionHandler
-    // отлавливаем исключение NullPointerException
-    public Map<String, String> handleNullableCount(final NullPointerException e) {
-        // возвращаем сообщение об ошибке
-        return Map.of("error", "Параметр count не указан.",
-                "errorMessage", e.getMessage());
+    @ExceptionHandler({IllegalArgumentException.class, NullPointerException.class})
+    // в аргументах указывается родительское исключение
+    public Map<String, String> handleIncorrectCount(final RuntimeException e) {
+        return Map.of(
+                "error", "Ошибка с параметром count.",
+                "errorMessage", e.getMessage()
+        );
     }
 
     @ExceptionHandler
