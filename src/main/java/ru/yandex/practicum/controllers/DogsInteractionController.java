@@ -18,6 +18,13 @@ public class DogsInteractionController {
 
     @GetMapping("/pet")
     public Map<String, String> pet(@RequestParam(required = false) final Integer count) {
+        if (count == null) {
+            throw new IncorrectCountException("Параметр count равен null.");
+        }
+        if (count <= 0) {
+            throw new IncorrectCountException("Параметр count имеет отрицательное значение.");
+        }
+
         happiness += count;
         return Map.of("action", "Вильнул хвостом. ".repeat(count));
     }
