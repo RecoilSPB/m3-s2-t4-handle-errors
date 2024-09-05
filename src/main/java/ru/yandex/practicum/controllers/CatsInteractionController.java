@@ -1,5 +1,6 @@
 package ru.yandex.practicum.controllers;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.exceptions.HappinessOverflowException;
 import ru.yandex.practicum.exceptions.IncorrectCountException;
@@ -45,27 +46,28 @@ public class CatsInteractionController {
 
     @ExceptionHandler
     // в аргументах указывается родительское исключение
-    public Map<String, String> handleIncorrectCount(final IncorrectCountException e) {
-        return Map.of(
-                "error", "Ошибка с параметром count.",
-                "errorMessage", e.getMessage()
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIncorrectCount(final IncorrectCountException e) {
+        return new ErrorResponse("Ошибка с параметром count.",
+                e.getMessage()
         );
     }
 
     @ExceptionHandler
     // отлавливаем исключение RuntimeException
-    public Map<String, String> handleError(final RuntimeException e) {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleError(final RuntimeException e) {
         // возвращаем сообщение об ошибке
-        return Map.of("error", "Произошла ошибка!",
-                "errorMessage", e.getMessage());
+        return new ErrorResponse("Произошла ошибка!",
+                e.getMessage());
     }
 
     // метод handleHappinessOverflow
     @ExceptionHandler
-    public Map<String, String> handleHappinessOverflow(final HappinessOverflowException e) {
-        return Map.of(
-                "error", "Осторожно, вы так избалуете котика!",
-                "happinessLevel", String.valueOf(e.getHappinessLevel())
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleHappinessOverflow(final HappinessOverflowException e) {
+        return new ErrorResponse("Осторожно, вы так избалуете котика!",
+                String.valueOf(e.getHappinessLevel())
         );
     }
 }
