@@ -1,6 +1,7 @@
 package ru.yandex.practicum.controllers;
 
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.exceptions.HappinessOverflowException;
 import ru.yandex.practicum.exceptions.IncorrectCountException;
 
 import java.util.Map;
@@ -12,6 +13,10 @@ public class CatsInteractionController {
 
     @GetMapping("/converse")
     public Map<String, String> converse() {
+        // проверка happiness
+        if (happiness == 10 || happiness > 10) {
+            throw new HappinessOverflowException(happiness, "Осторожно, вы так избалуете котика!");
+        }
         happiness++;
         return Map.of("talk", "Мяу");
     }
@@ -23,6 +28,10 @@ public class CatsInteractionController {
         }
         if (count <= 0) {
             throw new IncorrectCountException("Параметр count имеет отрицательное значение.");
+        }
+        // проверка happiness
+        if (happiness == 10 || happiness > 10) {
+            throw new HappinessOverflowException(happiness, "Осторожно, вы так избалуете котика!");
         }
 
         happiness += count;
@@ -49,5 +58,14 @@ public class CatsInteractionController {
         // возвращаем сообщение об ошибке
         return Map.of("error", "Произошла ошибка!",
                 "errorMessage", e.getMessage());
+    }
+
+    // метод handleHappinessOverflow
+    @ExceptionHandler
+    public Map<String, String> handleHappinessOverflow(final HappinessOverflowException e) {
+        return Map.of(
+                "error", "Осторожно, вы так избалуете котика!",
+                "happinessLevel", String.valueOf(e.getHappinessLevel())
+        );
     }
 }

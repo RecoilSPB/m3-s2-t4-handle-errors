@@ -1,6 +1,11 @@
 package ru.yandex.practicum.controllers;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.exceptions.HappinessOverflowException;
 import ru.yandex.practicum.exceptions.IncorrectCountException;
 
 import java.util.Map;
@@ -12,8 +17,17 @@ public class DogsInteractionController {
 
     @GetMapping("/converse")
     public Map<String, String> converse() {
+        // проверка happiness
+        if (happiness == 10 || happiness > 10) {
+            throw new HappinessOverflowException(happiness, "Осторожно, вы так избалуете котика!");
+        }
         happiness += 2;
         return Map.of("talk", "Гав!");
+    }
+
+    @GetMapping("/happiness")
+    public Map<String, Integer> happiness() {
+        return Map.of("happiness", happiness);
     }
 
     @GetMapping("/pet")
@@ -25,17 +39,16 @@ public class DogsInteractionController {
             throw new IncorrectCountException("Параметр count имеет отрицательное значение.");
         }
 
+        // проверка happiness
+        if (happiness == 10 || happiness > 10) {
+            throw new HappinessOverflowException(happiness, "Осторожно, вы так избалуете пёсика!");
+        }
+
         happiness += count;
         return Map.of("action", "Вильнул хвостом. ".repeat(count));
     }
 
-    @GetMapping("/happiness")
-    public Map<String, Integer> happiness() {
-        return Map.of("happiness", happiness);
-    }
-
     @ExceptionHandler
-    // в аргументах указывается родительское исключение
     public Map<String, String> handleIncorrectCount(final IncorrectCountException e) {
         return Map.of(
                 "error", "Ошибка с параметром count.",
@@ -43,11 +56,12 @@ public class DogsInteractionController {
         );
     }
 
+    // метод handleHappinessOverflow
     @ExceptionHandler
-    // отлавливаем исключение RuntimeException
-    public Map<String, String> handleError(final RuntimeException e) {
-        // возвращаем сообщение об ошибке
-        return Map.of("error", "Произошла ошибка!",
-                "errorMessage", e.getMessage());
+    public Map<String, String> handleHappinessOverflow(final HappinessOverflowException e) {
+        return Map.of(
+                "error", "Осторожно, вы так избалуете пёсика!",
+                "happinessLevel", String.valueOf(e.getHappinessLevel())
+        );
     }
 }
