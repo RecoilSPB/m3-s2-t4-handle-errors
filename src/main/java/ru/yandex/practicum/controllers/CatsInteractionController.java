@@ -2,6 +2,7 @@ package ru.yandex.practicum.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.exceptions.HappinessOverflowException;
 import ru.yandex.practicum.exceptions.IncorrectCountException;
 
@@ -44,30 +45,8 @@ public class CatsInteractionController {
         return Map.of("happiness", happiness);
     }
 
-    @ExceptionHandler
-    // в аргументах указывается родительское исключение
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIncorrectCount(final IncorrectCountException e) {
-        return new ErrorResponse("Ошибка с параметром count.",
-                e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    // отлавливаем исключение RuntimeException
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleError(final RuntimeException e) {
-        // возвращаем сообщение об ошибке
-        return new ErrorResponse("Произошла ошибка!",
-                e.getMessage());
-    }
-
-    // метод handleHappinessOverflow
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleHappinessOverflow(final HappinessOverflowException e) {
-        return new ErrorResponse("Осторожно, вы так избалуете котика!",
-                String.valueOf(e.getHappinessLevel())
-        );
+    @GetMapping("/feed")
+    public Map<String, Integer> feed() {
+        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "Метод /feed ещё не реализован.");
     }
 }
